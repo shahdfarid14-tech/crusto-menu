@@ -1,0 +1,12 @@
+{
+  "name": "CRUSTO Restaurant Menu",
+  "short_name": "CRUSTO",
+  "description": "منيو مطعم كراستو للطلبات والتوصيل",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#e65100",
+  "lang": "ar",
+  "dir": "rtl"
+}
