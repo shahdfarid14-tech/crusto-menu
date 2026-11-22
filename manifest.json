@@ -8,5 +8,12 @@
   "background_color": "#121212",
   "theme_color": "#e65100",
   "lang": "ar",
-  "dir": "rtl"
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "./Gemini_Generated_Image_3d5f5q3d5f5q3d5f",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
