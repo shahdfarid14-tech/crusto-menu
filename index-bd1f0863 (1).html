@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUSTO | طعم أصيل.. جودة تليق بيك</title>
+    <!-- تحميل Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- تحميل خطوط جوجل العربية (Cairo & Tajawal) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- تحميل أيقونات FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="manifest" href="./manifest.json">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        crusto: {
+                            dark: '#0f0a07',
+                            wood: '#1c120c',
+                            card: '#241710',
+                            border: '#3d281c',
+                            orange: '#f97316',
+                            fire: '#ea580c',
+                            gold: '#f59e0b',
+                            cream: '#fef3c7'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* تخصيص شريط التمرير */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1c120c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f97316;
+            border-radius: 9999px;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* خلفية بنمط خشبي داكن خفيف */
+        .wood-bg {
+            background-color: #0f0a07;
+            background-image: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.14) 0%, transparent 60%),
+                              repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 14px);
+        }
+        @media print {
+            body * { visibility: hidden; }
+            #print-receipt-area, #print-receipt-area * { visibility: visible; }
+            #print-receipt-area { position: fixed; left: 0; top: 0; width: 100%; background: white; color: black; padding: 20px; }
+        }
+    </style>
+</head>
+<body class="wood-bg text-stone-100 font-sans min-h-screen flex flex-col selection:bg-orange-500 selection:text-white">
+
+    <!-- شريط التنقل العلوي -->
+    <header class="sticky top-0 z-40 bg-[#140d09]/95 backdrop-blur-md border-b border-crusto-border shadow-lg">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex items-center justify-between gap-2">
+            <!-- شعار المطعم -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('menu')">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-orange-500 via-red-600 to-amber-500 p-0.5 shadow-lg shadow-orange-600/30 flex-shrink-0">
+                    <div class="w-full h-full bg-crusto-wood rounded-2xl flex items-center justify-center relative overflow-hidden">
+                        <i class="fa-solid fa-fire-flame-curved text-orange-500 text-xl sm:text-2xl animate-pulse"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <h1 class="text-xl sm:text-2xl font-black tracking-wider bg-gradient-to-l from-amber-400 via-orange-500 to-red-500 bg-clip-text text-transparent">CRUSTO</h1>
+                        <span class="text-[10px] bg-orange-500/20 text-orange-400 border border-orange-500/30 px-1.5 py-0.5 rounded-full font-bold">كراستو</span>
+                    </div>
+                    <p class="text-[11px] sm:text-xs text-amber-200/80 font-medium">طعم أصيل.. جودة تليق بيك</p>
+                </div>
+            </div>
+
+            <!-- أزرار التنقل الرئيسية -->
+            <nav class="flex items-center gap-1.5 sm:gap-2">
+                <button onclick="switchView('menu')" id="nav-menu" class="nav-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-orange-600 text-white shadow-md shadow-orange-600/20">
+                    <i class="fa-solid fa-utensils"></i>
+                    <span>المنيو</span>
+                </button>
+                <button onclick="switchView('track')" id="nav-track" class="nav-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-crusto-card text-stone-300 hover:text-white border border-crusto-border relative">
+                    <i class="fa-solid fa-motorcycle"></i>
+                    <span class="hidden sm:inline">تتبع طلبي</span>
+                    <span class="sm:hidden">طلبي</span>
+                    <span id="active-order-dot" class="hidden w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+                </button>
+                <button onclick="switchView('admin')" id="nav-admin" class="nav-btn px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-crusto-card text-stone-300 hover:text-white border border-crusto-border">
+                    <i class="fa-solid fa-cash-register"></i>
+                    <span class="hidden md:inline">الكاشير والإدارة</span>
+                    <span class="md:hidden">الإدارة</span>
+                </button>
+            </nav>
+
+            <!-- زر السلة -->
+            <button onclick="toggleCart(true)" class="relative bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white px-3.5 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-lg shadow-orange-600/30 flex items-center gap-2 transition transform active:scale-95">
+                <i class="fa-solid fa-bag-shopping text-base"></i>
+                <span class="hidden sm:inline">السلة</span>
+                <span id="cart-badge" class="bg-crusto-dark text-amber-400 font-black px-2 py-0.5 rounded-lg text-xs">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- شريط معلومات التواصل السريع -->
+    <div class="bg-crusto-wood/90 border-b border-crusto-border/70 px-4 py-2 text-xs">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-stone-300">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1 text-green-400 font-bold">
+                    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                    مفتوح الآن لاستقبال الطلبات
+                </span>
+                <span class="text-stone-600">|</span>
+                <span class="text-amber-300/90"><i class="fa-solid fa-fire text-orange-500 ml-1"></i>مشاوي • بيتزا • كريب • برجر • باستا</span>
+            </div>
+            <div class="flex items-center gap-3 font-bold">
+                <a href="tel:01025184195" class="hover:text-orange-400 transition flex items-center gap-1">
+                    <i class="fa-solid fa-phone text-orange-500"></i>
+                    <span dir="ltr">01025184195</span>
+                </a>
+                <a href="https://wa.me/201127272000" target="_blank" class="hover:text-green-400 transition flex items-center gap-1">
+                    <i class="fa-brands fa-whatsapp text-green-500 text-sm"></i>
+                    <span dir="ltr">01127272000</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5">
+
+        <!-- ==================== 1. شاشة المنيو ==================== -->
+        <section id="view-menu" class="space-y-6">
+            <!-- بانر ترحيبي + بحث -->
+            <div class="bg-gradient-to-l from-crusto-card via-[#2c190e] to-crusto-card border border-crusto-border rounded-3xl p-5 sm:p-7 shadow-xl relative overflow-hidden">
+                <div class="absolute -left-10 -bottom-10 w-44 h-44 bg-orange-600/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="inline-block bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-bold px-3 py-1 rounded-full mb-2">
+                            🔥 مشاوي على أصولها وأحلى المخبوزات
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-black text-white leading-tight">
+                            اطلب وجبتك المفضلة من <span class="text-orange-500">CRUSTO</span>
+                        </h2>
+                        <p class="text-stone-400 text-xs sm:text-sm mt-1">اختر الأصناف والأحجام المناسبة ليك، وابعت طلبك مباشرة على الواتساب أو الكاشير.</p>
+                    </div>
+                    <!-- مربع البحث -->
+                    <div class="w-full md:w-80 relative">
+                        <input type="text" id="search-input" oninput="renderMenu()" placeholder="ابحث عن كفتة، بيتزا، كريب، برجر..." 
+                            class="w-full bg-crusto-dark/90 border border-crusto-border focus:border-orange-500 rounded-2xl py-3 pr-11 pl-4 text-sm text-white placeholder-stone-500 outline-none transition">
+                        <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-stone-500"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- شريط تصنيف الأقسام -->
+            <div class="sticky top-[65px] z-30 bg-crusto-dark/90 backdrop-blur-md py-2 -mx-3 px-3 sm:mx-0 sm:px-0">
+                <div id="category-tabs" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                    <!-- يتم توليد الأزرار ديناميكياً -->
+                </div>
+            </div>
+
+            <!-- شبكة عرض الأصناف -->
+            <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+                <!-- يتم توليد بطاقات الأصناف ديناميكياً -->
+            </div>
+        </section>
+
+        <!-- ==================== 2. شاشة تتبع الطلب للعميل ==================== -->
+        <section id="view-track" class="hidden max-w-2xl mx-auto space-y-6">
+            <div class="bg-crusto-card border border-crusto-border rounded-3xl p-6 shadow-xl">
+                <div class="flex items-center justify-between border-b border-crusto-border pb-4 mb-5">
+                    <div>
+                        <h2 class="text-xl font-black text-white flex items-center gap-2">
+                            <i class="fa-solid fa-route text-orange-500"></i>
+                            تتبع حالة طلبك
+                        </h2>
+                        <p class="text-xs text-stone-400 mt-1">تتحدث الحالة تلقائيًا فور تحديثها من كاشير المطعم</p>
+                    </div>
+                    <button onclick="switchView('menu')" class="text-xs bg-crusto-wood hover:bg-orange-600/20 text-orange-400 border border-orange-500/30 px-3 py-2 rounded-xl font-bold transition">
+                        + طلب جديد
+                    </button>
+                </div>
+
+                <!-- البحث برقم طلب سابق -->
+                <div class="flex gap-2 mb-6">
+                    <input type="text" id="track-order-input" placeholder="أدخل رقم الطلب (مثال: CR-1001)" class="flex-1 bg-crusto-dark border border-crusto-border rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-orange-500">
+                    <button onclick="searchOrderToTrack()" class="bg-orange-600 hover:bg-orange-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition">
+                        تتبع
+                    </button>
+                </div>
+
+                <div id="track-order-content">
+                    <!-- محتوى تتبع الطلب -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 3. شاشة الكاشير والإدارة ==================== -->
+        <section id="view-admin" class="hidden space-y-6">
+            <!-- شاشة تسجيل الدخول للكاشير -->
+            <div id="admin-login-box" class="max-w-md mx-auto bg-crusto-card border border-crusto-border rounded-3xl p-6 sm:p-8 text-center shadow-2xl">
+                <div class="w-16 h-16 rounded-2xl bg-orange-500/20 text-orange-500 flex items-center justify-center text-3xl mx-auto mb-4 border border-orange-500/30">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h2 class="text-xl font-black text-white">دخول الكاشير والإدارة</h2>
+                <p class="text-xs text-stone-400 mt-1 mb-5">أدخل الرقم السري لإدارة الطلبات وتعديل أسعار المنيو<br><span class="text-amber-400 font-bold">(الرقم السري للمعاينة: 1234)</span></p>
+                <div class="space-y-3">
+                    <input type="password" id="admin-pin-input" onkeypress="if(event.key==='Enter') verifyAdminPin()" placeholder="••••" maxlength="6"
+                        class="w-full text-center tracking-[0.5em] text-xl font-black bg-crusto-dark border border-crusto-border focus:border-orange-500 rounded-2xl py-3 px-4 text-white outline-none">
+                    <button onclick="verifyAdminPin()" class="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold py-3 rounded-2xl shadow-lg transition">
+                        دخول لوحة التحكم
+                    </button>
+                </div>
+            </div>
+
+            <!-- لوحة التحكم الفعلية بعد الدخول -->
+            <div id="admin-dashboard" class="hidden space-y-6">
+                <div class="bg-crusto-card border border-crusto-border rounded-3xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-orange-600/20 text-orange-500 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-desktop"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg sm:text-xl font-black text-white">لوحة تحكم مطعم CRUSTO</h2>
+                            <p class="text-xs text-stone-400">إدارة الطلبات الحية وتحديث أصناف وأسعار المنيو</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="switchAdminTab('orders')" id="tab-admin-orders" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-orange-600 text-white transition">
+                            <i class="fa-solid fa-receipt ml-1"></i> طلبات الكاشير (<span id="admin-orders-count">0</span>)
+                        </button>
+                        <button onclick="switchAdminTab('menu-mgmt')" id="tab-admin-menu" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-crusto-dark text-stone-300 border border-crusto-border transition">
+                            <i class="fa-solid fa-pen-to-square ml-1"></i> إدارة المنيو
+                        </button>
+                        <button onclick="logoutAdmin()" class="px-3 py-2 rounded-xl text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition">
+                            خروج
+                        </button>
+                    </div>
+                </div>
+
+                <!-- تبويب 1: شاشة الكاشير والطلبات -->
+                <div id="admin-orders-panel" class="space-y-4">
+                    <div id="admin-orders-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- الطلبات تدرج هنا -->
+                    </div>
+                </div>
+
+                <!-- تبويب 2: إدارة المنيو -->
+                <div id="admin-menu-panel" class="hidden space-y-6">
+                    <!-- نموذج إضافة صنف جديد -->
+                    <div class="bg-crusto-card border border-crusto-border rounded-3xl p-5 sm:p-6">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                            <h3 class="text-base sm:text-lg font-black text-amber-400">
+                                <i class="fa-solid fa-plus-circle ml-1"></i> إضافة صنف جديد للمنيو
+                            </h3>
+                            <button onclick="resetMenuToDefault()" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-xl font-bold transition">
+                                <i class="fa-solid fa-rotate-left ml-1"></i> استعادة المنيو الأصلي
+                            </button>
+                        </div>
+                        <form onsubmit="addNewMenuItem(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <div>
+                                <label class="block text-xs text-stone-400 mb-1">اسم الصنف *</label>
+                                <input type="text" id="new-item-name" required placeholder="مثال: بيتزا كراستو سبيشيال" class="w-full bg-crusto-dark border border-crusto-border rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-orange-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-stone-400 mb-1">القسم *</label>
+                                <select id="new-item-cat" class="w-full bg-crusto-dark border border-crusto-border rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-orange-500">
+                                    <option value="grills">المشويات والوجبات</option>
+                                    <option value="burgers">البرجر والحواوشي والتوستر</option>
+                                    <option value="pasta">المكرونات</option>
+                                    <option value="crepe">الكريب</option>
+                                    <option value="pizza">البيتزا والكاليزوني</option>
+                                    <option value="specials">ركن القنبلة وركن البايا</option>
+                                    <option value="extras">الإضافات والمشروبات</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-stone-400 mb-1">السعر (بالجنيه) *</label>
+                                <input type="number" id="new-item-price" required min="1" placeholder="150" class="w-full bg-crusto-dark border border-crusto-border rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-orange-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-stone-400 mb-1">وصف مختصر</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="new-item-desc" placeholder="مكونات الأكلة..." class="w-full bg-crusto-dark border border-crusto-border rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-orange-500">
+                                    <button type="submit" class="bg-orange-600 hover:bg-orange-500 text-white font-bold px-4 rounded-xl text-sm whitespace-nowrap transition">
+                                        إضافة
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- جدول/قائمة تعديل الأصناف الحالية -->
+                    <div class="bg-crusto-card border border-crusto-border rounded-3xl p-5 sm:p-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                            <h3 class="text-base sm:text-lg font-black text-white">تعديل الأصناف والأسعار الحالية</h3>
+                            <input type="text" id="admin-menu-search" oninput="renderAdminMenuList()" placeholder="بحث في الأصناف..." class="bg-crusto-dark border border-crusto-border rounded-xl px-3 py-2 text-xs sm:text-sm text-white outline-none focus:border-orange-500 w-full sm:w-64">
+                        </div>
+                        <div id="admin-menu-list" class="space-y-2.5 max-h-[550px] overflow-y-auto pl-1">
+                            <!-- قائمة تعديل الأصناف -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================== السلة الجانبية ونموذج إتمام الطلب ==================== -->
+    <div id="cart-drawer" class="fixed inset-0 z-50 hidden">
+        <!-- خلفية معتمة -->
+        <div onclick="toggleCart(false)" class="absolute inset-0 bg-black/75 backdrop-blur-sm transition-opacity"></div>
+        
+        <!-- جسم السلة -->
+        <div class="absolute top-0 left-0 h-full w-full max-w-md bg-crusto-wood border-r border-crusto-border shadow-2xl flex flex-col">
+            <!-- رأس السلة -->
+            <div class="p-4 sm:p-5 bg-crusto-card border-b border-crusto-border flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-orange-600/20 text-orange-500 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-white text-base sm:text-lg">سلة طلباتك</h3>
+                        <p class="text-xs text-stone-400">راجع الأصناف وأكمل بيانات التوصيل</p>
+                    </div>
+                </div>
+                <button onclick="toggleCart(false)" class="w-9 h-9 rounded-xl bg-crusto-dark text-stone-400 hover:text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- محتوى السلة القابل للتمرير -->
+            <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5">
+                <!-- قائمة العناصر المختارة -->
+                <div id="cart-items-container" class="space-y-3">
+                    <!-- تدرج هنا -->
+                </div>
+
+                <!-- نموذج بيانات العميل والدفع (يظهر فقط لو السلة مش فاضية) -->
+                <div id="checkout-form-section" class="hidden space-y-4 pt-4 border-t border-crusto-border">
+                    <h4 class="font-black text-amber-400 text-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-user-check"></i> بيانات الاستلام والدفع
+                    </h4>
+
+                    <!-- نوع الطلب -->
+                    <div class="grid grid-cols-2 gap-2 bg-crusto-dark p-1.5 rounded-2xl border border-crusto-border">
+                        <button type="button" onclick="setOrderType('delivery')" id="btn-type-delivery" class="py-2 rounded-xl text-xs font-bold bg-orange-600 text-white transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-motorcycle"></i> توصيل (دليفري)
+                        </button>
+                        <button type="button" onclick="setOrderType('dinein')" id="btn-type-dinein" class="py-2 rounded-xl text-xs font-bold text-stone-400 hover:text-white transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-utensils"></i> داخل المطعم (صالة)
+                        </button>
+                    </div>
+
+                    <!-- حقول البيانات -->
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-stone-300 mb-1 font-semibold">الاسم بالكامل *</label>
+                            <input type="text" id="cust-name" placeholder="اكتب اسمك هنا" class="w-full bg-crusto-dark border border-crusto-border focus:border-orange-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-stone-300 mb-1 font-semibold">رقم الموبايل *</label>
+                            <input type="tel" id="cust-phone" placeholder="01xxxxxxxxx" class="w-full bg-crusto-dark border border-crusto-border focus:border-orange-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none text-right" dir="ltr">
+                        </div>
+                        <div id="address-field-group">
+                            <label class="block text-xs text-stone-300 mb-1 font-semibold">العنوان بالتفصيل *</label>
+                            <textarea id="cust-address" rows="2" placeholder="الشارع، رقم العمارة، الدور، علامة مميزة..." class="w-full bg-crusto-dark border border-crusto-border focus:border-orange-500 rounded-xl px-3.5 py-2 text-sm text-white outline-none"></textarea>
+                        </div>
+                        <div id="table-field-group" class="hidden">
+                            <label class="block text-xs text-stone-300 mb-1 font-semibold">رقم الترابيزة *</label>
+                            <input type="text" id="cust-table" placeholder="مثال: ترابيزة رقم 5" class="w-full bg-crusto-dark border border-crusto-border focus:border-orange-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-stone-300 mb-1 font-semibold">ملاحظات إضافية (اختياري)</label>
+                            <input type="text" id="cust-notes" placeholder="بدون شطة، زيادة طحينة، إلخ..." class="w-full bg-crusto-dark border border-crusto-border focus:border-orange-500 rounded-xl px-3.5 py-2 text-sm text-white outline-none">
+                        </div>
+                    </div>
+
+                    <!-- وسيلة الدفع -->
+                    <div class="space-y-2 pt-2">
+                        <label class="block text-xs text-stone-300 font-semibold">طريقة الدفع</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" onclick="setPaymentMethod('cash')" id="pay-cash" class="p-2.5 rounded-xl border border-orange-500 bg-orange-500/15 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition">
+                                <i class="fa-solid fa-money-bill-wave text-green-400"></i> كاش عند الاستلام
+                            </button>
+                            <button type="button" onclick="setPaymentMethod('online')" id="pay-online" class="p-2.5 rounded-xl border border-crusto-border bg-crusto-dark text-stone-400 text-xs font-bold flex items-center justify-center gap-1.5 transition">
+                                <i class="fa-solid fa-wallet text-amber-400"></i> محفظة / إنستاباي
+                            </button>
+                            <button type="button" onclick="setPaymentMethod('paymob')" id="pay-paymob" class="p-2.5 rounded-xl border border-crusto-border bg-crusto-dark text-stone-400 text-xs font-bold flex items-center justify-center gap-1.5 transition">
+                                <i class="fa-solid fa-credit-card text-sky-400"></i> أونلاين (تجربة)
+                            </button>
+                        </div>
+                        <!-- دفع Paymob التجريبي -->
+                        <div id="paymob-payment-info" class="hidden bg-sky-500/10 border border-sky-500/30 rounded-xl p-3 text-xs text-sky-100 space-y-2">
+                            <p class="font-bold text-sky-400"><i class="fa-solid fa-flask ml-1"></i> دفع أونلاين تجريبي - Paymob Test (مفيش فلوس حقيقية بتتخصم):</p>
+                            <div class="grid grid-cols-3 gap-1.5">
+                                <button type="button" onclick="setPaymobMethod('card')" id="pm-card" class="p-2 rounded-lg border border-sky-500 bg-sky-500/15 text-white font-bold transition"><i class="fa-solid fa-credit-card text-sky-300"></i> بطاقة</button>
+                                <button type="button" onclick="setPaymobMethod('wallet')" id="pm-wallet" class="p-2 rounded-lg border border-crusto-border bg-crusto-dark text-stone-400 font-bold transition"><i class="fa-solid fa-mobile-screen text-red-400"></i> فودافون كاش</button>
+                                <button type="button" onclick="setPaymobMethod('kiosk')" id="pm-kiosk" class="p-2 rounded-lg border border-crusto-border bg-crusto-dark text-stone-400 font-bold transition"><i class="fa-solid fa-store text-emerald-400"></i> فوري</button>
+                            </div>
+                            <div id="paymob-wallet-row" class="hidden space-y-1">
+                                <input id="paymob-wallet-phone" type="tel" dir="ltr" placeholder="01xxxxxxxxx" class="w-full bg-crusto-dark border border-crusto-border rounded-lg p-2 text-white text-left placeholder-stone-500">
+                                <p class="text-[11px] text-stone-300">رقم محفظة فودافون كاش اللي هيوصلها طلب الدفع</p>
+                            </div>
+                            <p class="text-[11px] text-stone-300" id="paymob-card-hint">للتجربة استخدم بطاقة الاختبار: <span dir="ltr" class="select-all text-white">5123 4567 8901 2346</span> - CVV: <span dir="ltr" class="text-white">123</span> - أي تاريخ مستقبلي</p>
+                            <p id="paymob-status" class="hidden text-[11px] text-amber-300"></p>
+                            <div id="paymob-fawry-ref" class="hidden bg-emerald-500/10 border border-emerald-500/40 rounded-lg p-2 text-center space-y-1">
+                                <p class="text-emerald-300 font-bold">ادفع من أي ماكينة أو تطبيق فوري بالرقم المرجعي ده:</p>
+                                <p id="paymob-fawry-ref-num" class="text-lg font-black text-white tracking-widest select-all" dir="ltr"></p>
+                            </div>
+                        </div>
+                        <!-- تفاصيل الدفع أونلاين -->
+                        <div id="online-payment-info" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-xs text-amber-200 space-y-1.5">
+                            <p class="font-bold text-amber-400"><i class="fa-solid fa-circle-info ml-1"></i> بيانات التحويل الإلكتروني:</p>
+                            <p>فودافون كاش / إنستاباي على رقم: <strong class="text-white select-all" dir="ltr">01127272000</strong></p>
+                            <p class="text-[11px] text-stone-300">يرجى إرسال صورة إيصال التحويل مع رسالة الطلب على واتساب لتأكيد التجهيز فوراً.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- تذييل السلة وأزرار الإرسال -->
+            <div id="cart-footer" class="hidden p-4 sm:p-5 bg-crusto-card border-t border-crusto-border space-y-3">
+                <div class="space-y-1 text-xs sm:text-sm">
+                    <div class="flex justify-between text-stone-400">
+                        <span>المجموع الفرعي:</span>
+                        <span id="summary-subtotal" class="font-bold text-white">0 ج.م</span>
+                    </div>
+                    <div class="flex justify-between text-stone-400" id="delivery-fee-row">
+                        <span>رسوم التوصيل (تقديرية):</span>
+                        <span id="summary-delivery" class="font-bold text-amber-400">20 ج.م</span>
+                    </div>
+                    <div class="flex justify-between text-base font-black text-white pt-2 border-t border-crusto-border/70">
+                        <span>الإجمالي النهائي:</span>
+                        <span id="summary-total" class="text-orange-500 text-lg">0 ج.م</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-2 pt-1">
+                    <button onclick="submitOrder('whatsapp')" class="w-full bg-[#25D366] hover:bg-[#20bd5a] text-stone-950 font-black py-3 px-4 rounded-2xl text-sm shadow-lg flex items-center justify-center gap-2 transition transform active:scale-98">
+                        <i class="fa-brands fa-whatsapp text-xl"></i>
+                        <span>إرسال الطلب عبر واتساب</span>
+                    </button>
+                    <button onclick="submitOrder('cashier')" class="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold py-2.5 px-4 rounded-2xl text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-check-circle"></i>
+                        <span>تأكيد وإرسال للوحة الكاشير مباشرة</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- صندوق التنبيهات المخصص (بديل alert) -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-xs sm:max-w-sm pointer-events-none"></div>
+
+    <!-- منطقة مخفية لطباعة الفاتورة -->
+    <div id="print-receipt-area" class="hidden"></div>
+
+    <!-- الفوتر -->
+    <footer class="bg-[#120b07] border-t border-crusto-border py-6 px-4 mt-10 text-center text-xs text-stone-400">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <span class="font-black text-orange-500 text-base">CRUSTO</span>
+                <span>— طعم أصيل.. جودة تليق بيك</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span>للطلبات: <strong class="text-stone-200" dir="ltr">01025184195</strong></span>
+                <span>واتساب: <strong class="text-green-400" dir="ltr">01127272000</strong></span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== كود الجافاسكربت والتطبيق ==================== -->
+    <script>
+        // 1. تعريف الأقسام
+        const CATEGORIES = [
+            { id: 'all', name: 'الكل', icon: 'fa-border-all' },
+            { id: 'grills', name: 'المشويات والوجبات', icon: 'fa-fire-burner' },
+            { id: 'burgers', name: 'البرجر والحواوشي والتوستر', icon: 'fa-burger' },
+            { id: 'pasta', name: 'المكرونات', icon: 'fa-bowl-food' },
+            { id: 'crepe', name: 'الكريب', icon: 'fa-stroopwafel' },
+            { id: 'pizza', name: 'البيتزا والكاليزوني', icon: 'fa-pizza-slice' },
+            { id: 'specials', name: 'ركن القنبلة والبايا', icon: 'fa-bomb' },
+            { id: 'extras', name: 'الإضافات والمشروبات', icon: 'fa-bottle-water' }
+        ];
+
+        // 2. بيانات المنيو الكاملة المستخرجة بدقة من صور مطعم CRUSTO
+        const DEFAULT_MENU_ITEMS = [
+            // --- المشويات والوجبات ---
+            {
+                id: 'g-kofta',
+                category: 'grills',
+                name: 'كفتة مشوية على الفحم',
+                desc: 'كفتة بلدي متبلة على أصولها ومشوية على الفحم',
+                icon: 'fa-drumstick-bite',
+                color: 'from-red-600 to-orange-600',
+                variants: [
+                    { label: 'سندوتش كفتة', price: 40 },
+                    { label: 'سندوتش كفتة دبل', price: 75 },
+                    { label: '1/8 كيلو', price: 80 },
+                    { label: '1/4 كيلو', price: 165 },
+                    { label: '1/3 كيلو', price: 215 },
+                    { label: '1/2 كيلو', price: 325 },
+                    { label: '1 كيلو', price: 650 }
+                ]
+            },
+            {
+                id: 'g-chicken',
+                category: 'grills',
+                name: 'فراخ مشوية على الفحم',
+                desc: 'فراخ طازجة بتتبيلة كراستو الخاصة مشوية على الفحم',
+                icon: 'fa-drumstick-bite',
+                color: 'from-amber-600 to-orange-600',
+                variants: [
+                    { label: '1/4 فرخة', price: 85 },
+                    { label: '1/2 فرخة', price: 150 },
+                    { label: 'فرخة كاملة', price: 300 }
+                ]
+            },
+            {
+                id: 'g-meat',
+                category: 'grills',
+                name: 'لحمة مشوية (كباب)',
+                desc: 'قطع لحم بتلو/ضاني طرية مشوية على الفحم',
+                icon: 'fa-bacon',
+                color: 'from-red-700 to-amber-700',
+                variants: [
+                    { label: '1/8 كيلو', price: 125 },
+                    { label: '1/4 كيلو', price: 240 },
+                    { label: '1/3 كيلو', price: 320 },
+                    { label: '1/2 كيلو', price: 480 },
+                    { label: '1 كيلو', price: 900 }
+                ]
+            },
+            {
+                id: 'g-mix-meat',
+                category: 'grills',
+                name: 'لحمة مشوية مشكل',
+                desc: 'تشكيلة مميزة من الكباب والكفتة والريش المشوية',
+                icon: 'fa-fire',
+                color: 'from-orange-600 to-red-700',
+                variants: [
+                    { label: '1/4 كيلو', price: 220 },
+                    { label: '1/2 كيلو', price: 440 },
+                    { label: '1 كيلو', price: 850 }
+                ]
+            },
+            {
+                id: 'g-meal-thigh',
+                category: 'grills',
+                name: 'وجبة مشويات (ورك فرخة)',
+                desc: '2 صابع كفتة + ورك فرخة مشوي + أرز + سلطة + طحينة + عيش',
+                icon: 'fa-utensils',
+                color: 'from-amber-500 to-orange-600',
+                variants: [{ label: 'وجبة كاملة', price: 160 }]
+            },
+            {
+                id: 'g-meal-breast',
+                category: 'grills',
+                name: 'وجبة مشويات (صدر فرخة)',
+                desc: '2 صابع كفتة + صدر فرخة مشوي + أرز + سلطة + طحينة + عيش',
+                icon: 'fa-utensils',
+                color: 'from-amber-500 to-red-600',
+                variants: [{ label: 'وجبة كاملة', price: 170 }]
+            },
+
+            // --- البرجر والحواوشي والتوستر ---
+            {
+                id: 'b-crusto',
+                category: 'burgers',
+                name: 'بيف برجر كراستو (200 جرام)',
+                desc: 'قطعة برجر لحم صافي 200 جرام مشوية مع صوص كراستو والخضروات الطازجة',
+                icon: 'fa-burger',
+                color: 'from-orange-500 to-amber-600',
+                variants: [{ label: '200 جرام', price: 140 }]
+            },
+            {
+                id: 'b-cheese',
+                category: 'burgers',
+                name: 'تشيز برجر (200 جرام)',
+                desc: 'برجر لحم 200 جرام غرقان بصوص الجبنة الشيدر السايحة',
+                icon: 'fa-burger',
+                color: 'from-amber-500 to-yellow-600',
+                variants: [{ label: '200 جرام', price: 135 }]
+            },
+            {
+                id: 'b-mix',
+                category: 'burgers',
+                name: 'ميكس بيف برجر (200 جرام)',
+                desc: 'برجر لحم 200 جرام مع إضافات الجبن والصوصات المميزة',
+                icon: 'fa-burger',
+                color: 'from-red-600 to-orange-500',
+                variants: [{ label: '200 جرام', price: 135 }]
+            },
+            {
+                id: 'b-hawawshi',
+                category: 'burgers',
+                name: 'حواوشي لحمة بلدي',
+                desc: 'رغيف حواوشي بلدي مقرمش محشو لحم مفروم متبل على الفحم',
+                icon: 'fa-bread-slice',
+                color: 'from-amber-700 to-orange-600',
+                variants: [
+                    { label: 'عادي', price: 40 },
+                    { label: 'بالموتزاريلا', price: 50 }
+                ]
+            },
+            {
+                id: 'b-toaster-fries',
+                category: 'burgers',
+                name: 'توستر بطاطس',
+                desc: 'عيش تورتيلا محمص محشو بطاطس مقرمشة وصوصات',
+                icon: 'fa-hotdog',
+                color: 'from-yellow-600 to-amber-600',
+                variants: [
+                    { label: 'صغير', price: 45 },
+                    { label: 'وسط', price: 50 },
+                    { label: 'كبير', price: 60 }
+                ]
+            },
+            {
+                id: 'b-toaster-strips',
+                category: 'burgers',
+                name: 'توستر ستريبس',
+                desc: 'عيش تورتيلا محمص محشو قطع دجاج ستريبس مقرمشة وجبنة',
+                icon: 'fa-hotdog',
+                color: 'from-orange-500 to-red-600',
+                variants: [
+                    { label: 'صغير', price: 75 },
+                    { label: 'وسط', price: 85 },
+                    { label: 'كبير', price: 90 }
+                ]
+            },
+
+            // --- المكرونات ---
+            {
+                id: 'p-minced',
+                category: 'pasta',
+                name: 'باستا مفروم فرن',
+                desc: 'طاجن مكرونة باللحم المفروم والصلصة الحمراء في الفرن',
+                icon: 'fa-bowl-food',
+                color: 'from-red-600 to-orange-600',
+                variants: [{ label: 'طاجن', price: 100 }]
+            },
+            {
+                id: 'p-sausage',
+                category: 'pasta',
+                name: 'باستا سوسيس',
+                desc: 'مكرونة بقطع السوسيس والصلصة الغنية والتوابل',
+                icon: 'fa-bowl-food',
+                color: 'from-orange-600 to-red-500',
+                variants: [{ label: 'طبق', price: 100 }]
+            },
+            {
+                id: 'p-mushroom',
+                category: 'pasta',
+                name: 'باستا خضار بالمشروم',
+                desc: 'مكرونة مع تشكيلة خضروات طازجة ومشروم',
+                icon: 'fa-bowl-food',
+                color: 'from-emerald-600 to-teal-700',
+                variants: [{ label: 'طبق', price: 90 }]
+            },
+            {
+                id: 'p-mix-cheese',
+                category: 'pasta',
+                name: 'باستا ميكس جبن',
+                desc: 'مكرونة بصوص الكريمة وتشكيلة أجبان سايحة',
+                icon: 'fa-bowl-food',
+                color: 'from-amber-500 to-yellow-600',
+                variants: [{ label: 'طبق', price: 95 }]
+            },
+            {
+                id: 'p-mix-chicken',
+                category: 'pasta',
+                name: 'باستا ميكس فراخ',
+                desc: 'مكرونة بتشكيلة قطع الدجاج المتبلة والصوص الكريمي',
+                icon: 'fa-bowl-food',
+                color: 'from-orange-500 to-amber-600',
+                variants: [{ label: 'طبق', price: 110 }]
+            },
+            {
+                id: 'p-strips',
+                category: 'pasta',
+                name: 'باستا استريبس',
+                desc: 'مكرونة بقطع الدجاج الاستريبس المقرمشة والصوص الأبيض أو الأحمر',
+                icon: 'fa-bowl-food',
+                color: 'from-amber-600 to-orange-600',
+                variants: [{ label: 'طبق', price: 110 }]
+            },
+            {
+                id: 'p-alfredo',
+                category: 'pasta',
+                name: 'باستا ألفريدو',
+                desc: 'مكرونة بصوص الألفريدو الكريمي مع قطع الدجاج والمشروم',
+                icon: 'fa-bowl-food',
+                color: 'from-yellow-500 to-amber-600',
+                variants: [{ label: 'طبق', price: 115 }]
+            },
+            {
+                id: 'p-negresco',
+                category: 'pasta',
+                name: 'باستا نجرسكو',
+                desc: 'طاجن مكرونة بالدجاج والصوص الأبيض والجبنة الموتزاريلا في الفرن',
+                icon: 'fa-bowl-food',
+                color: 'from-amber-500 to-orange-500',
+                variants: [{ label: 'طاجن', price: 110 }]
+            },
+            {
+                id: 'p-shish-strips',
+                category: 'pasta',
+                name: 'باستا شيش على استريبس',
+                desc: 'ميكس شيش طاووق مشوي مع قطع استريبس مقرمشة',
+                icon: 'fa-bowl-food',
+                color: 'from-orange-600 to-red-600',
+                variants: [{ label: 'طبق', price: 110 }]
+            },
+            {
+                id: 'p-mix-meat',
+                category: 'pasta',
+                name: 'باستا مكس لحوم',
+                desc: 'مكرونة بتشكيلة لحوم متنوعة وصوص غني',
+                icon: 'fa-bowl-food',
+                color: 'from-red-700 to-orange-600',
+                variants: [{ label: 'طبق', price: 115 }]
+            },
+            {
+                id: 'p-shrimp',
+                category: 'pasta',
+                name: 'باستا جمبري',
+                desc: 'مكرونة بالجمبري المتبل مع الصوص الكريمي أو الأحمر',
+                icon: 'fa-shrimp',
+                color: 'from-rose-600 to-orange-500',
+                variants: [{ label: 'طبق', price: 175 }]
+            },
+            {
+                id: 'p-seafood',
+                category: 'pasta',
+                name: 'باستا سي فود',
+                desc: 'مكرونة بتشكيلة فواكه البحر الطازجة والجمبري',
+                icon: 'fa-shrimp',
+                color: 'from-cyan-600 to-blue-700',
+                variants: [{ label: 'طبق', price: 185 }]
+            },
+
+            // --- الكريب ---
+            {
+                id: 'c-shish',
+                category: 'crepe',
+                name: 'كريب شيش طاووق',
+                desc: 'كريب محشو قطع شيش طاووق مشوية مع الجبنة والصوصات',
+                icon: 'fa-stroopwafel',
+                color: 'from-orange-500 to-amber-600',
+                variants: [
+                    { label: 'وسط', price: 90 },
+                    { label: 'كبير', price: 100 },
+                    { label: 'جامبو', price: 120 }
+                ]
+            },
+            {
+                id: 'c-strips-pane',
+                category: 'crepe',
+                name: 'كريب استربس على بانيه',
+                desc: 'ميكس استربس مقرمش مع دجاج بانيه والجبن',
+                icon: 'fa-stroopwafel',
+                color: 'from-amber-500 to-orange-600',
+                variants: [
+                    { label: 'وسط', price: 90 },
+                    { label: 'كبير', price: 100 },
+                    { label: 'جامبو', price: 120 }
+                ]
+            },
+            {
+                id: 'c-mix-chicken-meat',
+                category: 'crepe',
+                name: 'كريب ميكس فراخ على لحوم',
+                desc: 'كريب عملاق يجمع بين تشكيلة الفراخ وتشكيلة اللحوم',
+                icon: 'fa-stroopwafel',
+                color: 'from-red-600 to-orange-600',
+                variants: [
+                    { label: 'وسط', price: 150 },
+                    { label: 'كبير', price: 180 },
+                    { label: 'جامبو', price: 200 }
+                ]
+            },
+            {
+                id: 'c-mix-chicken',
+                category: 'crepe',
+                name: 'كريب ميكس فراخ',
+                desc: 'بانيه + استريبس + شيش طاووق مع الجبنة الموتزاريلا',
+                icon: 'fa-stroopwafel',
+                color: 'from-orange-500 to-yellow-600',
+                variants: [
+                    { label: 'وسط', price: 120 },
+                    { label: 'كبير', price: 140 },
+                    { label: 'جامبو', price: 160 }
+                ]
+            },
+            {
+                id: 'c-mix-meat',
+                category: 'crepe',
+                name: 'كريب مكس لحوم',
+                desc: 'برجر + كفتة + سوسيس مع الجبنة والصوصات',
+                icon: 'fa-stroopwafel',
+                color: 'from-red-700 to-amber-600',
+                variants: [
+                    { label: 'وسط', price: 120 },
+                    { label: 'كبير', price: 140 },
+                    { label: 'جامبو', price: 160 }
+                ]
+            },
+            {
+                id: 'c-pane',
+                category: 'crepe',
+                name: 'كريب بانيه',
+                desc: 'قطع دجاج بانيه مقرمشة مع بطاطس وجبنة وصوصات',
+                icon: 'fa-stroopwafel',
+                color: 'from-amber-500 to-orange-500',
+                variants: [
+                    { label: 'صغير', price: 60 },
+                    { label: 'وسط', price: 70 },
+                    { label: 'كبير', price: 80 }
+                ]
+            },
+            {
+                id: 'c-kofta',
+                category: 'crepe',
+                name: 'كريب كفتة',
+                desc: 'كفتة مشوية على الفحم داخل كريب مقرمش مع طحينة وجبن',
+                icon: 'fa-stroopwafel',
+                color: 'from-red-600 to-amber-600',
+                variants: [
+                    { label: 'صغير', price: 60 },
+                    { label: 'وسط', price: 70 },
+                    { label: 'كبير', price: 80 }
+                ]
+            },
+            {
+                id: 'c-burger',
+                category: 'crepe',
+                name: 'كريب برجر',
+                desc: 'برجر مشوي مع جبنة شيدر وصوصات داخل كريب ساخن',
+                icon: 'fa-stroopwafel',
+                color: 'from-orange-600 to-amber-600',
+                variants: [
+                    { label: 'صغير', price: 60 },
+                    { label: 'وسط', price: 70 },
+                    { label: 'كبير', price: 80 }
+                ]
+            },
+            {
+                id: 'c-sausage',
+                category: 'crepe',
+                name: 'كريب سوسيس',
+                desc: 'سوسيس مشوي مع خضروات وجبنة وصوصات',
+                icon: 'fa-stroopwafel',
+                color: 'from-rose-600 to-orange-500',
+                variants: [
+                    { label: 'صغير', price: 70 },
+                    { label: 'وسط', price: 80 },
+                    { label: 'كبير', price: 90 },
+                    { label: 'جامبو', price: 100 }
+                ]
+            },
+            {
+                id: 'c-strips',
+                category: 'crepe',
+                name: 'كريب استريبس',
+                desc: 'أصابع دجاج استريبس مقرمشة مع صوص الجبنة',
+                icon: 'fa-stroopwafel',
+                color: 'from-amber-500 to-orange-600',
+                variants: [
+                    { label: 'صغير', price: 70 },
+                    { label: 'وسط', price: 80 },
+                    { label: 'كبير', price: 90 },
+                    { label: 'جامبو', price: 100 }
+                ]
+            },
+            {
+                id: 'c-mazag',
+                category: 'crepe',
+                name: 'كريب المزاج',
+                desc: 'خلطة كراستو الخاصة لأصحاب المزاج العالي',
+                icon: 'fa-crown',
+                color: 'from-amber-500 to-red-600',
+                variants: [{ label: 'سبيشيال', price: 130 }]
+            },
+            {
+                id: 'c-crusto',
+                category: 'crepe',
+                name: 'كريب كراستو',
+                desc: 'كريب كراستو المميز بحشوة غنية ومضاعفة',
+                icon: 'fa-fire',
+                color: 'from-orange-600 to-red-700',
+                variants: [{ label: 'سبيشيال', price: 150 }]
+            },
+            {
+                id: 'c-baby',
+                category: 'crepe',
+                name: 'بيبي كريب للأطفال',
+                desc: 'حجم مناسب للأطفال بحشوات لذيذة (يبدأ من 40 ج)',
+                icon: 'fa-child',
+                color: 'from-yellow-500 to-orange-500',
+                variants: [{ label: 'بيبي كريب', price: 40 }]
+            },
+
+            // --- البيتزا والكاليزوني ---
+            {
+                id: 'pz-crusto',
+                category: 'pizza',
+                name: 'بيتزا كراستو سبيشيال',
+                desc: 'بيتزا المطعم الخاصة بخلطة كراستو السرية وأجود الأجبان',
+                icon: 'fa-pizza-slice',
+                color: 'from-orange-600 to-red-600',
+                variants: [{ label: 'حجم عائلي مميز', price: 180 }]
+            },
+            {
+                id: 'pz-margherita',
+                category: 'pizza',
+                name: 'بيتزا مارجريتا',
+                desc: 'صلصة طماطم إيطالية مع جبنة موتزاريلا وزعتر',
+                icon: 'fa-pizza-slice',
+                color: 'from-red-500 to-orange-500',
+                variants: [{ label: 'وسط', price: 120 }, { label: 'كبير', price: 130 }]
+            },
+            {
+                id: 'pz-mix-cheese',
+                category: 'pizza',
+                name: 'بيتزا مشكل جبن',
+                desc: 'موتزاريلا + شيدر + رومي + كيري',
+                icon: 'fa-pizza-slice',
+                color: 'from-amber-500 to-yellow-500',
+                variants: [{ label: 'وسط', price: 145 }, { label: 'كبير', price: 160 }]
+            },
+            {
+                id: 'pz-chicken-texas',
+                category: 'pizza',
+                name: 'بيتزا تشكن تكساس',
+                desc: 'قطع دجاج متبلة على طريقة تكساس مع الهالبينو والجبن',
+                icon: 'fa-pizza-slice',
+                color: 'from-orange-600 to-amber-600',
+                variants: [{ label: 'وسط', price: 150 }, { label: 'كبير', price: 170 }]
+            },
+            {
+                id: 'pz-chicken-bbq',
+                category: 'pizza',
+                name: 'بيتزا تشكن باربيكيو',
+                desc: 'قطع دجاج مشوية مع صوص الباربيكيو المدخن والموتزاريلا',
+                icon: 'fa-pizza-slice',
+                color: 'from-amber-700 to-red-600',
+                variants: [{ label: 'وسط', price: 150 }, { label: 'كبير', price: 175 }]
+            },
+            {
+                id: 'pz-chicken-fresh',
+                category: 'pizza',
+                name: 'بيتزا تشكن فريش',
+                desc: 'قطع دجاج طازجة مع فلفل ألوان وزيتون وموتزاريلا',
+                icon: 'fa-pizza-slice',
+                color: 'from-orange-500 to-amber-500',
+                variants: [{ label: 'وسط', price: 150 }, { label: 'كبير', price: 175 }]
+            },
+            {
+                id: 'pz-chicken-ranch',
+                category: 'pizza',
+                name: 'بيتزا تشكن رانش',
+                desc: 'قطع دجاج مع صوص الرانش الكريمي والجبنة الموتزاريلا',
+                icon: 'fa-pizza-slice',
+                color: 'from-amber-500 to-orange-600',
+                variants: [{ label: 'وسط', price: 150 }, { label: 'كبير', price: 170 }]
+            },
+            {
+                id: 'pz-fajita',
+                category: 'pizza',
+                name: 'بيتزا فاهيتا',
+                desc: 'شرائح دجاج فاهيتا مع البصل والفلفل الألوان والتوابل المكسيكية',
+                icon: 'fa-pizza-slice',
+                color: 'from-red-600 to-orange-500',
+                variants: [{ label: 'وسط', price: 150 }, { label: 'كبير', price: 170 }]
+            },
+            {
+                id: 'pz-shish',
+                category: 'pizza',
+                name: 'بيتزا شيش طاووق',
+                desc: 'قطع شيش طاووق مشوية مع خضروات وجبنة',
+                icon: 'fa-pizza-slice',
+                color: 'from-orange-500 to-red-600',
+                variants: [{ label: 'وسط', price: 150 }, { label: 'كبير', price: 170 }]
+            },
+            {
+                id: 'pz-strips',
+                category: 'pizza',
+                name: 'بيتزا ستريبس',
+                desc: 'قطع دجاج ستريبس مقرمشة مع صوص الجبنة',
+                icon: 'fa-pizza-slice',
+                color: 'from-amber-600 to-orange-500',
+                variants: [{ label: 'وسط', price: 150 }, { label: 'كبير', price: 170 }]
+            },
+            {
+                id: 'pz-shish-strips',
+                category: 'pizza',
+                name: 'بيتزا شيش على استريبس',
+                desc: 'نصف شيش طاووق ونصف دجاج استريبس مقرمش',
+                icon: 'fa-pizza-slice',
+                color: 'from-orange-600 to-amber-600',
+                variants: [{ label: 'وسط', price: 150 }, { label: 'كبير', price: 170 }]
+            },
+            {
+                id: 'pz-chicken-turkey',
+                category: 'pizza',
+                name: 'بيتزا تشكن تركي',
+                desc: 'قطع دجاج مع شرائح التركي المدخن والموتزاريلا',
+                icon: 'fa-pizza-slice',
+                color: 'from-amber-600 to-red-500',
+                variants: [{ label: 'وسط', price: 150 }, { label: 'كبير', price: 170 }]
+            },
+            {
+                id: 'pz-super-crunchy',
+                category: 'pizza',
+                name: 'بيتزا سوبر كرانشي',
+                desc: 'دجاج كرانشي مقرمش مع صوص الشيدر والهالبينو',
+                icon: 'fa-pizza-slice',
+                color: 'from-orange-500 to-red-600',
+                variants: [{ label: 'وسط', price: 160 }, { label: 'كبير', price: 170 }]
+            },
+            {
+                id: 'pz-super-supreme',
+                category: 'pizza',
+                name: 'بيتزا سوبر سوبريم',
+                desc: 'تشكيلة لحوم وخضروات ومشروم وزيتون وموتزاريلا',
+                icon: 'fa-pizza-slice',
+                color: 'from-red-600 to-amber-600',
+                variants: [{ label: 'وسط', price: 150 }, { label: 'كبير', price: 170 }]
+            },
+            {
+                id: 'pz-mix-meat',
+                category: 'pizza',
+                name: 'بيتزا مكس لحوم',
+                desc: 'لحم مفروم + سوسيس + بسطرمة + سلامي',
+                icon: 'fa-pizza-slice',
+                color: 'from-red-700 to-orange-600',
+                variants: [{ label: 'وسط', price: 150 }, { label: 'كبير', price: 170 }]
+            },
+            {
+                id: 'pz-pepperoni',
+                category: 'pizza',
+                name: 'بيتزا بيبروني',
+                desc: 'شرائح البيبروني البقري مع الجبنة الموتزاريلا',
+                icon: 'fa-pizza-slice',
+                color: 'from-red-600 to-rose-600',
+                variants: [{ label: 'وسط', price: 150 }, { label: 'كبير', price: 175 }]
+            },
+            {
+                id: 'pz-sausage',
+                category: 'pizza',
+                name: 'بيتزا سوسيس',
+                desc: 'حلقات السوسيس مع الفلفل والزيتون والجبنة',
+                icon: 'fa-pizza-slice',
+                color: 'from-orange-600 to-red-500',
+                variants: [{ label: 'وسط', price: 150 }, { label: 'كبير', price: 170 }]
+            },
+            {
+                id: 'pz-minced',
+                category: 'pizza',
+                name: 'بيتزا لحم مفروم',
+                desc: 'لحم مفروم متبل مع خضروات وجبنة موتزاريلا',
+                icon: 'fa-pizza-slice',
+                color: 'from-amber-700 to-orange-600',
+                variants: [{ label: 'وسط', price: 150 }, { label: 'كبير', price: 170 }]
+            },
+            {
+                id: 'pz-sogoq',
+                category: 'pizza',
+                name: 'بيتزا سجق شرقي',
+                desc: 'سجق بلدي متبل مع فلفل وطماطم وجبنة موتزاريلا',
+                icon: 'fa-pizza-slice',
+                color: 'from-red-600 to-orange-600',
+                variants: [{ label: 'وسط', price: 140 }, { label: 'كبير', price: 165 }]
+            },
+            {
+                id: 'pz-pastrami',
+                category: 'pizza',
+                name: 'بيتزا بسطرمة',
+                desc: 'بسطرمة بلدي مع فلفل ألوان وزيتون وموتزاريلا',
+                icon: 'fa-pizza-slice',
+                color: 'from-rose-700 to-red-600',
+                variants: [{ label: 'وسط', price: 140 }, { label: 'كبير', price: 165 }]
+            },
+            // الكاليزوني
+            {
+                id: 'calzone-all',
+                category: 'pizza',
+                name: 'كاليزوني إيطالي محشو',
+                desc: 'فطيرة بيتزا إيطالية مغلقة محشوة بالجبنة الموتزاريلا وحشوتك المفضلة',
+                icon: 'fa-pizza-slice',
+                color: 'from-amber-600 to-orange-700',
+                variants: [
+                    { label: 'كاليزوني سجق', price: 155 },
+                    { label: 'كاليزوني شيدر', price: 155 },
+                    { label: 'كاليزوني مكس لحوم', price: 160 },
+                    { label: 'كاليزوني مفروم', price: 160 },
+                    { label: 'كاليزوني تشكن', price: 160 }
+                ]
+            },
+
+            // --- ركن القنبلة وركن البايا ---
+            {
+                id: 'sp-bomb-150',
+                category: 'specials',
+                name: 'ركن القنبلة (أصناف فردية)',
+                desc: 'اختراع كراستو المشبع بالجبن والصوصات الغنية',
+                icon: 'fa-bomb',
+                color: 'from-red-600 to-orange-600',
+                variants: [
+                    { label: 'قنبلة فراخ', price: 150 },
+                    { label: 'قنبلة شيش طاووق', price: 150 },
+                    { label: 'قنبلة استريبس', price: 150 },
+                    { label: 'قنبلة لحم مفروم', price: 150 },
+                    { label: 'قنبلة جمبري', price: 150 }
+                ]
+            },
+            {
+                id: 'sp-bomb-mix',
+                category: 'specials',
+                name: 'ركن القنبلة (ميكسات)',
+                desc: 'قنبلة كراستو بحشوة ميكس مضاعفة',
+                icon: 'fa-bomb',
+                color: 'from-orange-600 to-red-700',
+                variants: [
+                    { label: 'قنبلة مشكل فراخ', price: 160 },
+                    { label: 'قنبلة مشكل لحوم', price: 160 }
+                ]
+            },
+            {
+                id: 'sp-paella-chicken',
+                category: 'specials',
+                name: 'ركن البايا (دجاج)',
+                desc: 'أطباق البايا المميزة من مطبخ كراستو',
+                icon: 'fa-bowl-rice',
+                color: 'from-amber-500 to-orange-600',
+                variants: [
+                    { label: 'بايا فراخ (وسط)', price: 170 },
+                    { label: 'بايا فراخ (كبير)', price: 190 },
+                    { label: 'بايا استريبس (وسط)', price: 170 },
+                    { label: 'بايا استريبس (كبير)', price: 180 },
+                    { label: 'بايا استريبس (جامبو)', price: 190 },
+                    { label: 'بايا شيش طاووق (وسط)', price: 170 },
+                    { label: 'بايا شيش طاووق (كبير)', price: 180 },
+                    { label: 'بايا شيش طاووق (جامبو)', price: 190 }
+                ]
+            },
+            {
+                id: 'sp-paella-meat-sea',
+                category: 'specials',
+                name: 'ركن البايا (لحوم وسي فود)',
+                desc: 'بايا غنية باللحوم أو الجمبري والسي فود',
+                icon: 'fa-shrimp',
+                color: 'from-red-600 to-amber-600',
+                variants: [
+                    { label: 'بايا مشكل لحوم (وسط)', price: 180 },
+                    { label: 'بايا مشكل لحوم (كبير)', price: 210 },
+                    { label: 'بايا جمبري (وسط)', price: 180 },
+                    { label: 'بايا جمبري (كبير)', price: 210 },
+                    { label: 'بايا سي فود (وسط)', price: 180 },
+                    { label: 'بايا سي فود (كبير)', price: 220 }
+                ]
+            },
+
+            // --- الإضافات والمشروبات ---
+            {
+                id: 'ex-rice',
+                category: 'extras',
+                name: 'أرز بسمتي / مبهر',
+                desc: 'طبق أرز ساخن جانبي',
+                icon: 'fa-bowl-rice',
+                color: 'from-amber-500 to-yellow-600',
+                variants: [
+                    { label: 'طبق صغير', price: 35 },
+                    { label: 'طبق كبير', price: 45 }
+                ]
+            },
+            {
+                id: 'ex-fries',
+                category: 'extras',
+                name: 'باكت بطاطس كبير',
+                desc: 'بطاطس محمرة مقرمشة',
+                icon: 'fa-utensils',
+                color: 'from-yellow-500 to-amber-600',
+                variants: [{ label: 'باكت كبير', price: 20 }]
+            },
+            {
+                id: 'ex-cheese-cono',
+                category: 'extras',
+                name: 'جبنة كونو / إضافات جبن',
+                desc: 'إضافة جبنة كونو أو موتزاريلا لأي وجبة',
+                icon: 'fa-cheese',
+                color: 'from-amber-400 to-orange-500',
+                variants: [
+                    { label: 'جبنة كونو', price: 20 },
+                    { label: 'إضافة جبن', price: 20 },
+                    { label: 'إضافة جبن إكسترا', price: 30 }
+                ]
+            },
+            {
+                id: 'ex-salads-sauces',
+                category: 'extras',
+                name: 'سلطات وصوصات',
+                desc: 'سلطة بلدي طازجة، طحينة، أو صوصات متنوعة',
+                icon: 'fa-pepper-hot',
+                color: 'from-green-600 to-emerald-700',
+                variants: [
+                    { label: 'طحينة', price: 5 },
+                    { label: 'ظرف كاتشب', price: 5 },
+                    { label: 'سلطة خضراء', price: 10 },
+                    { label: 'إضافة صوصات', price: 20 }
+                ]
+            },
+            {
+                id: 'ex-drinks',
+                category: 'extras',
+                name: 'مشروبات ومياه',
+                desc: 'مشروبات غازية مثلجة ومياه معدنية',
+                icon: 'fa-bottle-water',
+                color: 'from-blue-600 to-cyan-600',
+                variants: [
+                    { label: 'مياه صغيرة', price: 7 },
+                    { label: 'مياه معدنية', price: 10 },
+                    { label: 'بيبسي كان', price: 20 }
+                ]
+            }
+        ];
+
+        // 3. إدارة الحالة والتخزين المحلي (LocalStorage)
+        let menuItems = JSON.parse(localStorage.getItem('crusto_menu_v1')) || JSON.parse(JSON.stringify(DEFAULT_MENU_ITEMS));
+        let cart = JSON.parse(localStorage.getItem('crusto_cart_v1')) || [];
+        let orders = JSON.parse(localStorage.getItem('crusto_orders_v1')) || [];
+        let activeCategory = 'all';
+        let selectedVariants = {}; // لتتبع الحجم المختار لكل بطاقة صنف
+        let orderType = 'delivery';
+        let paymentMethod = 'cash';
+        let isAdminLoggedIn = false;
+        let currentTrackedOrderId = localStorage.getItem('crusto_last_order_id') || '';
+
+        const DELIVERY_FEE = 20;
+        const WHATSAPP_NUMBER = '201127272000';
+
+        // حفظ البيانات في LocalStorage
+        function saveState() {
+            localStorage.setItem('crusto_menu_v1', JSON.stringify(menuItems));
+            localStorage.setItem('crusto_cart_v1', JSON.stringify(cart));
+            localStorage.setItem('crusto_orders_v1', JSON.stringify(orders));
+            if (currentTrackedOrderId) {
+                localStorage.setItem('crusto_last_order_id', currentTrackedOrderId);
+            }
+        }
+
+        // 4. عرض التنبيهات المخصصة (Toast)
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'bg-green-950/95 border-green-500 text-green-100',
+                error: 'bg-red-950/95 border-red-500 text-red-100',
+                info: 'bg-crusto-card/95 border-orange-500 text-amber-100'
+            };
+            const icons = {
+                success: 'fa-circle-check text-green-400',
+                error: 'fa-circle-exclamation text-red-400',
+                info: 'fa-bell text-orange-400'
+            };
+            toast.className = `pointer-events-auto border ${colors[type]} px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-xs sm:text-sm font-bold transform transition-all duration-300 translate-y-2 opacity-0`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type]} text-base"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        // 5. التبديل بين الشاشات الرئيسية (المنيو / التتبع / الإدارة)
+        function switchView(viewName) {
+            ['menu', 'track', 'admin'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+                const btn = document.getElementById(`nav-${v}`);
+                btn.classList.remove('bg-orange-600', 'text-white', 'shadow-md');
+                btn.classList.add('bg-crusto-card', 'text-stone-300', 'border', 'border-crusto-border');
+            });
+
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`nav-${viewName}`);
+            activeBtn.classList.remove('bg-crusto-card', 'text-stone-300', 'border', 'border-crusto-border');
+            activeBtn.classList.add('bg-orange-600', 'text-white', 'shadow-md');
+
+            if (viewName === 'track') renderTrackOrder();
+            if (viewName === 'admin' && isAdminLoggedIn) {
+                renderAdminOrders();
+                renderAdminMenuList();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 6. رسم أزرار الأقسام
+        function renderCategoryTabs() {
+            const container = document.getElementById('category-tabs');
+            container.innerHTML = CATEGORIES.map(cat => {
+                const isActive = activeCategory === cat.id;
+                return `
+                    <button onclick="selectCategory('${cat.id}')" 
+                        class="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition flex items-center gap-2 ${
+                            isActive 
+                            ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-600/25' 
+                            : 'bg-crusto-card text-stone-300 hover:text-white border border-crusto-border hover:border-orange-500/50'
+                        }">
+                        <i class="fa-solid ${cat.icon}"></i>
+                        <span>${cat.name}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectCategory(catId) {
+            activeCategory = catId;
+            renderCategoryTabs();
+            renderMenu();
+        }
+
+        // 7. رسم بطاقات المنيو
+        function renderMenu() {
+            const grid = document.getElementById('menu-grid');
+            const query = document.getElementById('search-input').value.trim().toLowerCase();
+
+            const filtered = menuItems.filter(item => {
+                const matchCat = activeCategory === 'all' || item.category === activeCategory;
+                const matchQuery = !query || 
+                    item.name.toLowerCase().includes(query) || 
+                    (item.desc && item.desc.toLowerCase().includes(query)) ||
+                    item.variants.some(v => v.label.toLowerCase().includes(query));
+                return matchCat && matchQuery;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-14 bg-crusto-card/50 border border-crusto-border rounded-3xl">
+                        <i class="fa-solid fa-magnifying-glass text-4xl text-stone-600 mb-3"></i>
+                        <p class="text-stone-300 font-bold">لا توجد أصناف مطابقة لبحثك</p>
+                        <button onclick="document.getElementById('search-input').value=''; selectCategory('all')" class="mt-3 text-xs text-orange-400 underline">عرض كل المنيو</button>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(item => {
+                const selectedIdx = selectedVariants[item.id] || 0;
+                const currentVariant = item.variants[selectedIdx] || item.variants[0];
+                const isAvailable = item.available !== false;
+
+                return `
+                    <div class="bg-crusto-card border border-crusto-border hover:border-orange-500/50 rounded-3xl overflow-hidden flex flex-col justify-between shadow-lg transition duration-200 group ${!isAvailable ? 'opacity-60' : ''}">
+                        <div>
+                            <!-- رأس البطاقة البصري -->
+                            <div class="h-28 bg-gradient-to-br ${item.color || 'from-orange-600 to-amber-700'} relative p-4 flex items-center justify-between overflow-hidden">
+                                <div class="absolute inset-0 bg-black/25"></div>
+                                <div class="relative z-10">
+                                    <span class="text-[10px] font-bold bg-black/40 text-amber-200 px-2.5 py-1 rounded-full backdrop-blur-sm">
+                                        ${CATEGORIES.find(c => c.id === item.category)?.name || 'CRUSTO'}
+                                    </span>
+                                    ${!isAvailable ? '<span class="mr-1 text-[10px] font-bold bg-red-600 text-white px-2 py-0.5 rounded-full">غير متاح حالياً</span>' : ''}
+                                </div>
+                                <div class="relative z-10 w-14 h-14 rounded-2xl bg-black/30 backdrop-blur-md flex items-center justify-center text-white text-2xl shadow-inner group-hover:scale-110 transition">
+                                    <i class="fa-solid ${item.icon || 'fa-utensils'}"></i>
+                                </div>
+                            </div>
+
+                            <!-- تفاصيل الصنف -->
+                            <div class="p-4 pb-2">
+                                <h3 class="font-black text-white text-base sm:text-lg leading-snug">${item.name}</h3>
+                                <p class="text-xs text-stone-400 mt-1 line-clamp-2 min-h-[32px]">${item.desc || 'محضر طازجاً على طريقة CRUSTO الخاصة'}</p>
+                            </div>
+                        </div>
+
+                        <!-- اختيار الحجم/الوزن + السعر وزر الإضافة -->
+                        <div class="p-4 pt-2 space-y-3">
+                            ${item.variants.length > 1 ? `
+                                <div>
+                                    <label class="block text-[11px] text-stone-400 mb-1.5 font-semibold">اختر الحجم / الوزن:</label>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        ${item.variants.map((v, idx) => `
+                                            <button type="button" onclick="selectItemVariant('${item.id}', ${idx})" 
+                                                class="px-2.5 py-1 rounded-xl text-[11px] font-bold transition ${
+                                                    idx === selectedIdx 
+                                                    ? 'bg-orange-600 text-white shadow-sm' 
+                                                    : 'bg-crusto-dark text-stone-300 border border-crusto-border hover:border-orange-500/40'
+                                                }">
+                                                ${v.label} (${v.price}ج)
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : `
+                                <div class="text-xs text-amber-300/80 font-semibold">
+                                    <i class="fa-solid fa-tag ml-1 text-orange-500"></i>${currentVariant.label}
+                                </div>
+                            `}
+
+                            <div class="flex items-center justify-between pt-2 border-t border-crusto-border/70">
+                                <div>
+                                    <span class="text-[11px] text-stone-400 block">السعر</span>
+                                    <span class="text-lg font-black text-amber-400">${currentVariant.price} <small class="text-xs font-bold text-stone-300">ج.م</small></span>
+                                </div>
+                                <button onclick="addToCart('${item.id}')" ${!isAvailable ? 'disabled' : ''}
+                                    class="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 disabled:from-stone-700 disabled:to-stone-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm shadow-md flex items-center gap-1.5 transition transform active:scale-95">
+                                    <i class="fa-solid fa-plus"></i>
+                                    <span>أضف للسلة</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectItemVariant(itemId, variantIdx) {
+            selectedVariants[itemId] = variantIdx;
+            renderMenu();
+        }
+
+        // 8. إدارة سلة الطلبات
+        function addToCart(itemId) {
+            const item = menuItems.find(i => i.id === itemId);
+            if (!item || item.available === false) return;
+
+            const variantIdx = selectedVariants[itemId] || 0;
+            const variant = item.variants[variantIdx] || item.variants[0];
+            const cartKey = `${item.id}__${variant.label}`;
+
+            const existing = cart.find(c => c.key === cartKey);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({
+                    key: cartKey,
+                    itemId: item.id,
+                    name: item.name,
+                    variantLabel: variant.label,
+                    price: variant.price,
+                    qty: 1
+                });
+            }
+
+            saveState();
+            updateCartUI();
+            showToast(`تمت إضافة "${item.name} - ${variant.label}" للسلة`, 'success');
+        }
+
+        function updateCartQty(cartKey, delta) {
+            const idx = cart.findIndex(c => c.key === cartKey);
+            if (idx === -1) return;
+
+            cart[idx].qty += delta;
+            if (cart[idx].qty <= 0) {
+                cart.splice(idx, 1);
+            }
+            saveState();
+            updateCartUI();
+        }
+
+        function removeFromCart(cartKey) {
+            cart = cart.filter(c => c.key !== cartKey);
+            saveState();
+            updateCartUI();
+        }
+
+        function toggleCart(open) {
+            const drawer = document.getElementById('cart-drawer');
+            if (open) {
+                drawer.classList.remove('hidden');
+                updateCartUI();
+            } else {
+                drawer.classList.add('hidden');
+            }
+        }
+
+        function setOrderType(type) {
+            orderType = type;
+            const btnDel = document.getElementById('btn-type-delivery');
+            const btnDine = document.getElementById('btn-type-dinein');
+            const addrGroup = document.getElementById('address-field-group');
+            const tableGroup = document.getElementById('table-field-group');
+
+            if (type === 'delivery') {
+                btnDel.className = 'py-2 rounded-xl text-xs font-bold bg-orange-600 text-white transition flex items-center justify-center gap-1.5';
+                btnDine.className = 'py-2 rounded-xl text-xs font-bold text-stone-400 hover:text-white transition flex items-center justify-center gap-1.5';
+                addrGroup.classList.remove('hidden');
+                tableGroup.classList.add('hidden');
+            } else {
+                btnDine.className = 'py-2 rounded-xl text-xs font-bold bg-orange-600 text-white transition flex items-center justify-center gap-1.5';
+                btnDel.className = 'py-2 rounded-xl text-xs font-bold text-stone-400 hover:text-white transition flex items-center justify-center gap-1.5';
+                tableGroup.classList.remove('hidden');
+                addrGroup.classList.add('hidden');
+            }
+            updateCartUI();
+        }
+
+        const PAY_BTN_ON = 'p-2.5 rounded-xl border border-orange-500 bg-orange-500/15 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition';
+        const PAY_BTN_OFF = 'p-2.5 rounded-xl border border-crusto-border bg-crusto-dark text-stone-400 text-xs font-bold flex items-center justify-center gap-1.5 transition';
+
+        function setPaymentMethod(method) {
+            paymentMethod = method;
+            document.getElementById('pay-cash').className = method === 'cash' ? PAY_BTN_ON : PAY_BTN_OFF;
+            document.getElementById('pay-online').className = method === 'online' ? PAY_BTN_ON : PAY_BTN_OFF;
+            document.getElementById('pay-paymob').className = method === 'paymob' ? PAY_BTN_ON : PAY_BTN_OFF;
+            document.getElementById('online-payment-info').classList.toggle('hidden', method !== 'online');
+            document.getElementById('paymob-payment-info').classList.toggle('hidden', method !== 'paymob');
+        }
+
+        function updateCartUI() {
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cart-badge').textContent = totalItems;
+
+            const container = document.getElementById('cart-items-container');
+            const checkoutSection = document.getElementById('checkout-form-section');
+            const footer = document.getElementById('cart-footer');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 rounded-full bg-crusto-card text-stone-600 flex items-center justify-center text-2xl mx-auto mb-3 border border-crusto-border">
+                            <i class="fa-solid fa-basket-shopping"></i>
+                        </div>
+                        <p class="font-bold text-stone-300">سلة الطلبات فارغة</p>
+                        <p class="text-xs text-stone-500 mt-1">أضف أكلاتك المفضلة من منيو CRUSTO للبدء</p>
+                    </div>
+                `;
+                checkoutSection.classList.add('hidden');
+                footer.classList.add('hidden');
+                return;
+            }
+
+            checkoutSection.classList.remove('hidden');
+            footer.classList.remove('hidden');
+
+            container.innerHTML = cart.map(item => `
+                <div class="bg-crusto-card border border-crusto-border rounded-2xl p-3 flex items-center justify-between gap-2">
+                    <div class="flex-1 min-w-0">
+                        <h5 class="font-bold text-white text-xs sm:text-sm truncate">${item.name}</h5>
+                        <p class="text-[11px] text-amber-400">${item.variantLabel} × ${item.price} ج.م</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 bg-crusto-dark rounded-xl p-1 border border-crusto-border">
+                        <button onclick="updateCartQty('${item.key}', 1)" class="w-7 h-7 rounded-lg bg-orange-600/20 text-orange-400 hover:bg-orange-600 hover:text-white flex items-center justify-center text-xs font-bold transition">+</button>
+                        <span class="w-6 text-center text-xs font-black text-white">${item.qty}</span>
+                        <button onclick="updateCartQty('${item.key}', -1)" class="w-7 h-7 rounded-lg bg-stone-800 text-stone-300 hover:bg-red-600 hover:text-white flex items-center justify-center text-xs font-bold transition">-</button>
+                    </div>
+                    <button onclick="removeFromCart('${item.key}')" class="text-stone-500 hover:text-red-400 p-1.5 transition" title="حذف">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const delivery = orderType === 'delivery' ? DELIVERY_FEE : 0;
+            const total = subtotal + delivery;
+
+            document.getElementById('summary-subtotal').textContent = `${subtotal} ج.م`;
+            document.getElementById('delivery-fee-row').style.display = orderType === 'delivery' ? 'flex' : 'none';
+            document.getElementById('summary-delivery').textContent = `${delivery} ج.م`;
+            document.getElementById('summary-total').textContent = `${total} ج.م`;
+        }
+
+        // ============================================================
+        // Paymob TEST mode (demo - no real money)
+        // كل المفاتيح هنا TEST keys من حساب تجريبي، يستحيل يتخصم منها فلوس حقيقية.
+        // مهم: قبل تشغيل الموقع بمدفوعات حقيقية، منطق الدفع ده لازم يتنقل
+        // لسيرفر (backend) لأن المفاتيح السرية مينفعش تبقى ظاهرة في كود الصفحة.
+        // ============================================================
+        const PAYMOB = {
+            API_KEY: 'ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2TVRJMk1qUTVOaXdpYm1GdFpTSTZJbWx1YVhScFlXd2lmUS5GalFwT3ByVE5VanltbVlLX1B0SnI5YTNCR3pYbkpPT05QNjBNcnc4X25scVpFeHIxa3VpMnFibzB5ODBNaXFOTkgxQ0owUllab3BVTjlQS3F2bjVUUQ==',
+            IFRAME_ID: 1101811,
+            INTEGRATIONS: { card: 6073634, wallet: 6073642, kiosk: 6073643 }
+        };
+        let paymobMethod = 'card';
+
+        function setPaymobMethod(m) {
+            paymobMethod = m;
+            const on = 'p-2 rounded-lg border border-sky-500 bg-sky-500/15 text-white font-bold transition';
+            const off = 'p-2 rounded-lg border border-crusto-border bg-crusto-dark text-stone-400 font-bold transition';
+            document.getElementById('pm-card').className = m === 'card' ? on : off;
+            document.getElementById('pm-wallet').className = m === 'wallet' ? on : off;
+            document.getElementById('pm-kiosk').className = m === 'kiosk' ? on : off;
+            document.getElementById('paymob-wallet-row').classList.toggle('hidden', m !== 'wallet');
+            document.getElementById('paymob-card-hint').classList.toggle('hidden', m !== 'card');
+            document.getElementById('paymob-fawry-ref').classList.add('hidden');
+            const st = document.getElementById('paymob-status');
+            st.classList.add('hidden'); st.textContent = '';
+        }
+
+        async function paymobFetch(path, body) {
+            const res = await fetch('https://accept.paymob.com/api/' + path, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.detail || ('Paymob HTTP ' + res.status));
+            return data;
+        }
+
+        async function startPaymobPayment(total, name, phone) {
+            const statusEl = document.getElementById('paymob-status');
+            statusEl.classList.remove('hidden');
+            statusEl.textContent = 'جاري تجهيز عملية الدفع التجريبية...';
+            const amountCents = Math.round(total * 100);
+
+            // 1) توكن الدخول
+            const auth = await paymobFetch('auth/tokens', { api_key: PAYMOB.API_KEY });
+
+            // 2) تسجيل الطلب عند Paymob
+            const items = cart.map(i => ({
+                name: i.name,
+                amount_cents: String(Math.round(i.price * 100)),
+                description: i.variantLabel || i.name,
+                quantity: String(i.qty)
+            }));
+            const order = await paymobFetch('ecommerce/orders', {
+                auth_token: auth.token,
+                delivery_needed: 'false',
+                amount_cents: String(amountCents),
+                currency: 'EGP',
+                merchant_order_id: 'CRUSTO-' + Date.now(),
+                items: items
+            });
+
+            // 3) مفتاح الدفع حسب الوسيلة المختارة
+            const parts = name.split(/\s+/);
+            const billing = {
+                first_name: parts[0] || name,
+                last_name: parts.slice(1).join(' ') || '-',
+                email: 'customer@crusto-test.com',
+                phone_number: phone,
+                apartment: 'NA', floor: 'NA', street: 'NA', building: 'NA',
+                city: 'Cairo', country: 'EG', state: 'Cairo',
+                shipping_method: 'NA', postal_code: 'NA'
+            };
+            const pk = await paymobFetch('acceptance/payment_keys', {
+                auth_token: auth.token,
+                amount_cents: amountCents,
+                expiration: 3600,
+                order_id: order.id,
+                billing_data: billing,
+                currency: 'EGP',
+                integration_id: PAYMOB.INTEGRATIONS[paymobMethod]
+            });
+
+            // 4) تنفيذ الدفع حسب الوسيلة
+            if (paymobMethod === 'card') {
+                window.open('https://accept.paymob.com/api/acceptance/iframes/' + PAYMOB.IFRAME_ID + '?payment_token=' + encodeURIComponent(pk.token), '_blank');
+                statusEl.textContent = 'فتحنا صفحة دفع البطاقة في تاب جديدة (وضع تجريبي).';
+                return { mode: 'card', paymobOrderId: order.id };
+            }
+            if (paymobMethod === 'wallet') {
+                const wp = document.getElementById('paymob-wallet-phone').value.trim();
+                const pay = await paymobFetch('acceptance/payments/pay', {
+                    auth_token: auth.token,
+                    source: { identifier: wp, subtype: 'WALLET' },
+                    payment_token: pk.token
+                });
+                const redirect = pay.redirect_url || (pay.data && pay.data.redirect_url);
+                if (redirect) window.open(redirect, '_blank');
+                statusEl.textContent = 'طلب الدفع اتبعت للمحفظة ' + wp + ' - أكده من الموبايل (تجريبي).';
+                return { mode: 'wallet', wallet: wp, txn: pay.id, pending: pay.pending };
+            }
+            // فوري / كشك: رقم مرجعي يتدفع عند أي نقطة فوري
+            const pay = await paymobFetch('acceptance/payments/pay', {
+                auth_token: auth.token,
+                source: { identifier: 'AGGREGATOR', subtype: 'AMAN' },
+                payment_token: pk.token
+            });
+            const ref = pay.data && pay.data.bill_reference;
+            if (ref) {
+                document.getElementById('paymob-fawry-ref').classList.remove('hidden');
+                document.getElementById('paymob-fawry-ref-num').textContent = String(ref);
+            }
+            statusEl.textContent = 'الرقم المرجعي جاهز - صوره وادفع بيه من فوري (تجريبي).';
+            return { mode: 'kiosk', reference: ref, txn: pay.id, pending: pay.pending };
+        }
+
+        // 9. إرسال وتأكيد الطلب (واتساب + لوحة الكاشير)
+        async function submitOrder(channel) {
+            if (cart.length === 0) return;
+
+            const name = document.getElementById('cust-name').value.trim();
+            const phone = document.getElementById('cust-phone').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
+            const table = document.getElementById('cust-table').value.trim();
+            const notes = document.getElementById('cust-notes').value.trim();
+
+            if (!name) {
+                showToast('من فضلك أدخل الاسم بالكامل', 'error');
+                document.getElementById('cust-name').focus();
+                return;
+            }
+            if (!phone || phone.length < 10) {
+                showToast('من فضلك أدخل رقم موبايل صحيح', 'error');
+                document.getElementById('cust-phone').focus();
+                return;
+            }
+            if (orderType === 'delivery' && !address) {
+                showToast('من فضلك أدخل عنوان التوصيل بالتفصيل', 'error');
+                document.getElementById('cust-address').focus();
+                return;
+            }
+            if (orderType === 'dinein' && !table) {
+                showToast('من فضلك أدخل رقم الترابيزة', 'error');
+                document.getElementById('cust-table').focus();
+                return;
+            }
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const delivery = orderType === 'delivery' ? DELIVERY_FEE : 0;
+            const total = subtotal + delivery;
+            const orderId = 'CR-' + (1001 + orders.length);
+
+            // لو الدفع أونلاين تجريبي: نفذ عملية Paymob الأول
+            let paymobResult = null;
+            if (paymentMethod === 'paymob') {
+                if (paymobMethod === 'wallet') {
+                    const wp = document.getElementById('paymob-wallet-phone').value.trim();
+                    if (!/^01[0-9]{9}$/.test(wp)) {
+                        showToast('من فضلك أدخل رقم محفظة فودافون كاش صحيح (11 رقم يبدأ بـ 01)', 'error');
+                        document.getElementById('paymob-wallet-phone').focus();
+                        return;
+                    }
+                }
+                try {
+                    paymobResult = await startPaymobPayment(total, name, phone);
+                } catch (e) {
+                    showToast('الدفع التجريبي ما تمش: ' + e.message, 'error');
+                    const st = document.getElementById('paymob-status');
+                    st.classList.remove('hidden');
+                    st.textContent = 'فشل الاتصال بـ Paymob: ' + e.message;
+                    return;
+                }
+            }
+
+            const newOrder = {
+                id: orderId,
+                createdAt: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
+                date: new Date().toLocaleDateString('ar-EG'),
+                customerName: name,
+                customerPhone: phone,
+                orderType: orderType,
+                location: orderType === 'delivery' ? address : table,
+                notes: notes,
+                paymentMethod: paymentMethod,
+                paymob: paymobResult,
+                items: JSON.parse(JSON.stringify(cart)),
+                subtotal,
+                delivery,
+                total,
+                status: 'received' // received -> preparing -> out -> delivered
+            };
+
+            // حفظ الطلب في النظام
+            orders.unshift(newOrder);
+            currentTrackedOrderId = orderId;
+            cart = [];
+            saveState();
+            updateCartUI();
+            updateActiveOrderDot();
+            toggleCart(false);
+
+            if (channel === 'whatsapp') {
+                const itemsText = newOrder.items.map(i => `• ${i.name} (${i.variantLabel}) × ${i.qty} = ${i.price * i.qty} ج.م`).join('\n');
+                const typeText = orderType === 'delivery' ? `توصيل للمنزل\n📍 العنوان: ${address}` : `داخل المطعم (صالة)\n🪑 الترابيزة: ${table}`;
+                const payText = paymentMethod === 'cash' ? 'كاش عند الاستلام'
+                              : paymentMethod === 'paymob' ? 'دفع أونلاين تجريبي (Paymob Test: بطاقة / فودافون كاش / فوري)'
+                              : 'دفع إلكتروني (محفظة / إنستاباي)';
+
+                const msg = `*طلب جديد من منيو CRUSTO* 🔥\n` +
+                            `--------------------------\n` +
+                            `*رقم الطلب:* ${orderId}\n` +
+                            `*العميل:* ${name}\n` +
+                            `*الموبايل:* ${phone}\n` +
+                            `*نوع الطلب:* ${typeText}\n` +
+                            `*طريقة الدفع:* ${payText}\n` +
+                            (notes ? `*ملاحظات:* ${notes}\n` : '') +
+                            `--------------------------\n` +
+                            `*الأصناف المطلوبة:*\n${itemsText}\n` +
+                            `--------------------------\n` +
+                            `المجموع الفرعي: ${subtotal} ج.م\n` +
+                            (delivery > 0 ? `التوصيل: ${delivery} ج.م\n` : '') +
+                            `*الإجمالي النهائي: ${total} ج.م*`;
+
+                const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+                window.open(waUrl, '_blank');
+                showToast(`تم تسجيل الطلب ${orderId} وفتح واتساب للإرسال`, 'success');
+            } else {
+                showToast(`تم تأكيد الطلب ${orderId} وإرساله للكاشير بنجاح!`, 'success');
+            }
+
+            switchView('track');
+        }
+
+        // 10. شاشة تتبع الطلب للعميل
+        function updateActiveOrderDot() {
+            const dot = document.getElementById('active-order-dot');
+            const active = orders.find(o => o.status !== 'delivered');
+            if (active) dot.classList.remove('hidden');
+            else dot.classList.add('hidden');
+        }
+
+        function searchOrderToTrack() {
+            const val = document.getElementById('track-order-input').value.trim().toUpperCase();
+            if (!val) return;
+            currentTrackedOrderId = val;
+            saveState();
+            renderTrackOrder();
+        }
+
+        function renderTrackOrder() {
+            const container = document.getElementById('track-order-content');
+            const order = orders.find(o => o.id === currentTrackedOrderId) || orders[0];
+
+            if (!order) {
+                container.innerHTML = `
+                    <div class="text-center py-10 text-stone-400">
+                        <i class="fa-solid fa-receipt text-4xl text-stone-600 mb-3"></i>
+                        <p class="font-bold text-stone-300">لا يوجد طلب نشط حالياً</p>
+                        <p class="text-xs mt-1">قم بطلب وجبتك من المنيو وسيظهر هنا تتبع مباشر لحالتها</p>
+                    </div>
+                `;
+                return;
+            }
+
+            document.getElementById('track-order-input').value = order.id;
+
+            const steps = [
+                { key: 'received', label: 'تم استلام الطلب', desc: 'وصل طلبك للكاشير وفي انتظار البدء', icon: 'fa-clipboard-check' },
+                { key: 'preparing', label: 'جاري التحضير في المطبخ', desc: 'الشيف بيجهز طلبك طازج الآن', icon: 'fa-fire-burner' },
+                { key: 'out', label: order.orderType === 'delivery' ? 'خرج مع الدليفري' : 'جاهز للتقديم على الترابيزة', desc: order.orderType === 'delivery' ? 'المندوب في الطريق إليك' : 'طلبك جاهز بالهنا والشفا', icon: 'fa-motorcycle' },
+                { key: 'delivered', label: 'تم التسليم بنجاح', desc: 'نتمنى لك وجبة شهية من CRUSTO', icon: 'fa-face-smile-beam' }
+            ];
+
+            const currentIdx = steps.findIndex(s => s.key === order.status);
+
+            container.innerHTML = `
+                <div class="bg-crusto-dark border border-crusto-border rounded-2xl p-4 mb-6 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <span class="text-xs text-stone-400">رقم الطلب:</span>
+                        <span class="font-black text-orange-500 text-base mr-1">${order.id}</span>
+                        <span class="text-[11px] text-stone-500 mr-2">(${order.createdAt})</span>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-orange-500/20 text-amber-300 border border-orange-500/30">
+                        ${steps[currentIdx]?.label || 'قيد المتابعة'}
+                    </span>
+                </div>
+
+                <!-- خطوات التتبع -->
+                <div class="space-y-4 mb-6 relative before:content-[''] before:absolute before:right-5 before:top-4 before:bottom-4 before:w-0.5 before:bg-crusto-border">
+                    ${steps.map((step, idx) => {
+                        const done = idx <= currentIdx;
+                        const active = idx === currentIdx;
+                        return `
+                            <div class="relative flex items-start gap-4 pr-1">
+                                <div class="relative z-10 w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition ${
+                                    done ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/30' : 'bg-crusto-wood text-stone-500 border border-crusto-border'
+                                } ${active ? 'ring-4 ring-orange-500/30 animate-pulse' : ''}">
+                                    <i class="fa-solid ${step.icon}"></i>
+                                </div>
+                                <div class="flex-1 pt-0.5">
+                                    <h4 class="font-bold text-sm ${done ? 'text-white' : 'text-stone-500'}">${step.label}</h4>
+                                    <p class="text-xs ${done ? 'text-stone-400' : 'text-stone-600'}">${step.desc}</p>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+
+                <!-- ملخص الفاتورة -->
+                <div class="bg-crusto-wood border border-crusto-border rounded-2xl p-4 space-y-2 text-xs">
+                    <h4 class="font-bold text-amber-400 mb-2">تفاصيل الطلب:</h4>
+                    ${order.items.map(i => `
+                        <div class="flex justify-between text-stone-300">
+                            <span>${i.name} (${i.variantLabel}) × ${i.qty}</span>
+                            <span class="font-bold">${i.price * i.qty} ج.م</span>
+                        </div>
+                    `).join('')}
+                    <div class="border-t border-crusto-border pt-2 mt-2 flex justify-between font-black text-sm text-white">
+                        <span>الإجمالي المدفوع / المطلوب:</span>
+                        <span class="text-orange-500">${order.total} ج.م</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 11. لوحة الكاشير والإدارة
+        function verifyAdminPin() {
+            const pin = document.getElementById('admin-pin-input').value.trim();
+            if (pin === '1234') {
+                isAdminLoggedIn = true;
+                document.getElementById('admin-login-box').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                renderAdminOrders();
+                renderAdminMenuList();
+                showToast('تم تسجيل الدخول للوحة التحكم', 'success');
+            } else {
+                showToast('الرقم السري غير صحيح (جرب 1234)', 'error');
+            }
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            document.getElementById('admin-pin-input').value = '';
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            document.getElementById('admin-login-box').classList.remove('hidden');
+        }
+
+        function switchAdminTab(tab) {
+            const ordersPanel = document.getElementById('admin-orders-panel');
+            const menuPanel = document.getElementById('admin-menu-panel');
+            const btnOrders = document.getElementById('tab-admin-orders');
+            const btnMenu = document.getElementById('tab-admin-menu');
+
+            if (tab === 'orders') {
+                ordersPanel.classList.remove('hidden');
+                menuPanel.classList.add('hidden');
+                btnOrders.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-orange-600 text-white transition';
+                btnMenu.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-crusto-dark text-stone-300 border border-crusto-border transition';
+                renderAdminOrders();
+            } else {
+                menuPanel.classList.remove('hidden');
+                ordersPanel.classList.add('hidden');
+                btnMenu.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-orange-600 text-white transition';
+                btnOrders.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-crusto-dark text-stone-300 border border-crusto-border transition';
+                renderAdminMenuList();
+            }
+        }
+
+        function renderAdminOrders() {
+            document.getElementById('admin-orders-count').textContent = orders.length;
+            const list = document.getElementById('admin-orders-list');
+
+            if (orders.length === 0) {
+                list.innerHTML = `
+                    <div class="col-span-full text-center py-12 bg-crusto-card border border-crusto-border rounded-3xl text-stone-400">
+                        <i class="fa-solid fa-inbox text-4xl text-stone-600 mb-2"></i>
+                        <p class="font-bold">لا توجد طلبات واردة حتى الآن</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const statusLabels = {
+                received: { text: 'طلب جديد', cls: 'bg-blue-500/20 text-blue-300 border-blue-500/30' },
+                preparing: { text: 'قيد التحضير', cls: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
+                out: { text: 'جاهز / خرج للتوصيل', cls: 'bg-purple-500/20 text-purple-300 border-purple-500/30' },
+                delivered: { text: 'مكتمل', cls: 'bg-green-500/20 text-green-300 border-green-500/30' }
+            };
+
+            list.innerHTML = orders.map(order => {
+                const st = statusLabels[order.status] || statusLabels.received;
+                return `
+                    <div class="bg-crusto-card border border-crusto-border rounded-3xl p-4 flex flex-col justify-between space-y-3 shadow-lg">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-crusto-border pb-2.5 mb-2.5">
+                                <div>
+                                    <span class="font-black text-orange-500 text-base">${order.id}</span>
+                                    <span class="text-[11px] text-stone-400 mr-1.5">${order.createdAt}</span>
+                                </div>
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${st.cls}">${st.text}</span>
+                            </div>
+
+                            <div class="text-xs space-y-1 text-stone-300 mb-3">
+                                <p><strong class="text-white">العميل:</strong> ${order.customerName} (<a href="tel:${order.customerPhone}" class="text-amber-400 underline" dir="ltr">${order.customerPhone}</a>)</p>
+                                <p><strong class="text-white">النوع:</strong> ${order.orderType === 'delivery' ? 'دليفري' : 'صالة'} — ${order.location}</p>
+                                <p><strong class="text-white">الدفع:</strong> ${order.paymentMethod === 'cash' ? 'كاش' : order.paymentMethod === 'paymob' ? 'أونلاين تجريبي (Paymob)' : 'أونلاين (محفظة/إنستاباي)'}</p>
+                                ${order.notes ? `<p class="text-amber-300 bg-amber-500/10 px-2 py-1 rounded-lg"><strong>ملاحظات:</strong> ${order.notes}</p>` : ''}
+                            </div>
+
+                            <div class="bg-crusto-dark rounded-2xl p-2.5 space-y-1 text-xs max-h-36 overflow-y-auto border border-crusto-border/60">
+                                ${order.items.map(i => `
+                                    <div class="flex justify-between">
+                                        <span>${i.name} (${i.variantLabel}) × ${i.qty}</span>
+                                        <span class="font-bold text-amber-400">${i.price * i.qty}ج</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-crusto-border space-y-2">
+                            <div class="flex justify-between items-center font-black text-sm">
+                                <span>الإجمالي:</span>
+                                <span class="text-orange-500 text-base">${order.total} ج.م</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-1.5 text-[11px] font-bold">
+                                <button onclick="changeOrderStatus('${order.id}', 'preparing')" class="py-1.5 px-2 rounded-xl bg-amber-600/20 hover:bg-amber-600 text-amber-300 hover:text-white border border-amber-500/30 transition">
+                                    جاري التحضير
+                                </button>
+                                <button onclick="changeOrderStatus('${order.id}', 'out')" class="py-1.5 px-2 rounded-xl bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/30 transition">
+                                    جاهز / دليفري
+                                </button>
+                                <button onclick="changeOrderStatus('${order.id}', 'delivered')" class="py-1.5 px-2 rounded-xl bg-green-600/20 hover:bg-green-600 text-green-300 hover:text-white border border-green-500/30 transition">
+                                    تم التسليم
+                                </button>
+                                <button onclick="printOrderReceipt('${order.id}')" class="py-1.5 px-2 rounded-xl bg-crusto-dark hover:bg-stone-700 text-stone-200 border border-crusto-border transition">
+                                    <i class="fa-solid fa-print ml-1"></i> طباعة بون
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function changeOrderStatus(orderId, newStatus) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            order.status = newStatus;
+            saveState();
+            renderAdminOrders();
+            updateActiveOrderDot();
+            showToast(`تم تحديث حالة الطلب ${orderId}`, 'info');
+        }
+
+        function printOrderReceipt(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            const printArea = document.getElementById('print-receipt-area');
+            printArea.innerHTML = `
+                <div style="font-family: Cairo, sans-serif; direction: rtl; max-width: 300px; margin: auto; text-align: center;">
+                    <h2 style="margin:0;">مطعم CRUSTO</h2>
+                    <p style="margin:2px 0; font-size:12px;">طعم أصيل.. جودة تليق بيك</p>
+                    <hr/>
+                    <p style="font-size:13px; text-align:right;">
+                        <strong>رقم الطلب:</strong> ${order.id}<br/>
+                        <strong>التاريخ:</strong> ${order.date} - ${order.createdAt}<br/>
+                        <strong>العميل:</strong> ${order.customerName}<br/>
+                        <strong>الموبايل:</strong> ${order.customerPhone}<br/>
+                        <strong>العنوان/الترابيزة:</strong> ${order.location}
+                    </p>
+                    <hr/>
+                    <table style="width:100%; font-size:12px; text-align:right; border-collapse: collapse;">
+                        ${order.items.map(i => `
+                            <tr>
+                                <td>${i.name} (${i.variantLabel}) × ${i.qty}</td>
+                                <td style="text-align:left;">${i.price * i.qty} ج</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                    <hr/>
+                    <p style="font-size:14px; font-weight:bold; text-align:left;">الإجمالي: ${order.total} ج.م</p>
+                    <p style="font-size:11px;">شكراً لطلبك من CRUSTO - 01127272000</p>
+                </div>
+            `;
+            printArea.classList.remove('hidden');
+            window.print();
+            printArea.classList.add('hidden');
+        }
+
+        // 12. إدارة المنيو (إضافة، تعديل سعر، إيقاف، حذف)
+        function addNewMenuItem(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-item-name').value.trim();
+            const category = document.getElementById('new-item-cat').value;
+            const price = Number(document.getElementById('new-item-price').value);
+            const desc = document.getElementById('new-item-desc').value.trim();
+
+            if (!name || !price) return;
+
+            const newItem = {
+                id: 'custom-' + Date.now(),
+                category,
+                name,
+                desc: desc || 'صنف مميز من مطبخ CRUSTO',
+                icon: 'fa-utensils',
+                color: 'from-orange-600 to-amber-600',
+                available: true,
+                variants: [{ label: 'عادي', price }]
+            };
+
+            menuItems.unshift(newItem);
+            saveState();
+            renderMenu();
+            renderAdminMenuList();
+            e.target.reset();
+            showToast(`تمت إضافة "${name}" إلى المنيو بنجاح`, 'success');
+        }
+
+        function renderAdminMenuList() {
+            const container = document.getElementById('admin-menu-list');
+            const query = (document.getElementById('admin-menu-search')?.value || '').trim().toLowerCase();
+
+            const list = menuItems.filter(i => !query || i.name.toLowerCase().includes(query));
+
+            container.innerHTML = list.map(item => `
+                <div class="bg-crusto-dark border border-crusto-border rounded-2xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-white text-sm">${item.name}</span>
+                            <span class="text-[10px] bg-crusto-card text-stone-400 px-2 py-0.5 rounded-full border border-crusto-border">
+                                ${CATEGORIES.find(c => c.id === item.category)?.name || ''}
+                            </span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            ${item.variants.map((v, idx) => `
+                                <div class="flex items-center gap-1 bg-crusto-card border border-crusto-border rounded-xl px-2 py-1 text-xs">
+                                    <span class="text-stone-300">${v.label}:</span>
+                                    <input type="number" value="${v.price}" onchange="updateItemVariantPrice('${item.id}', ${idx}, this.value)" 
+                                        class="w-16 bg-crusto-dark border border-crusto-border rounded px-1.5 py-0.5 text-amber-400 font-bold text-center outline-none focus:border-orange-500">
+                                    <span class="text-[10px] text-stone-500">ج</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 self-end sm:self-center">
+                        <button onclick="toggleItemAvailability('${item.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
+                            item.available !== false 
+                            ? 'bg-green-500/15 text-green-400 border-green-500/30' 
+                            : 'bg-stone-800 text-stone-400 border-stone-700'
+                        }">
+                            ${item.available !== false ? 'متاح' : 'غير متاح'}
+                        </button>
+                        <button onclick="deleteMenuItem('${item.id}')" class="w-8 h-8 rounded-xl bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/20 flex items-center justify-center transition" title="حذف الصنف">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateItemVariantPrice(itemId, variantIdx, newPrice) {
+            const val = Number(newPrice);
+            if (val <= 0) return;
+            const item = menuItems.find(i => i.id === itemId);
+            if (!item || !item.variants[variantIdx]) return;
+            item.variants[variantIdx].price = val;
+            saveState();
+            renderMenu();
+            showToast('تم تحديث السعر بنجاح', 'success');
+        }
+
+        function toggleItemAvailability(itemId) {
+            const item = menuItems.find(i => i.id === itemId);
+            if (!item) return;
+            item.available = item.available === false ? true : false;
+            saveState();
+            renderMenu();
+            renderAdminMenuList();
+            showToast(`تم تغيير حالة توفر "${item.name}"`, 'info');
+        }
+
+        function deleteMenuItem(itemId) {
+            menuItems = menuItems.filter(i => i.id !== itemId);
+            saveState();
+            renderMenu();
+            renderAdminMenuList();
+            showToast('تم حذف الصنف من المنيو', 'info');
+        }
+
+        function resetMenuToDefault() {
+            menuItems = JSON.parse(JSON.stringify(DEFAULT_MENU_ITEMS));
+            saveState();
+            renderMenu();
+            renderAdminMenuList();
+            showToast('تمت استعادة المنيو الأصلي بالكامل', 'success');
+        }
+
+        // 13. التهيئة عند تحميل الصفحة
+        window.onload = function() {
+            renderCategoryTabs();
+            renderMenu();
+            updateCartUI();
+            updateActiveOrderDot();
+        };
+    </script>
+</body>
+</html>
